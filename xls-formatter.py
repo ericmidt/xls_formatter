@@ -11,13 +11,16 @@ xls_df = original_xls_df.copy()
 ranges = [(1, 30), (31, 43), (44, 56), (57, 69), (70, 90)]
 
 # Insert new rows into xls_df at specific locations
-new_row_values = ['New Value 1', 'New Value 2']
+new_row_values = ['New Value 1', 'New Value 2', 'New Value 3']
 insert_locations = [5, 10, 35, 56, 78]
 
 for loc in insert_locations:
-    xls_df = pd.concat([xls_df.iloc[:loc - 1], pd.DataFrame([new_row_values], columns=xls_df.columns), xls_df.iloc[loc - 1:]])
+    # Create a new DataFrame for the row to insert
+    new_row = pd.DataFrame([new_row_values[:len(xls_df.columns)]], columns=xls_df.columns)
+    # Append the new row to the DataFrame
+    xls_df = xls_df.iloc[:loc]._append(new_row)._append(xls_df.iloc[loc:]).reset_index(drop=True)
 
-# Create a new Excel writer object
+# Create a new Excel writer object with the 'openpyxl' engine
 with pd.ExcelWriter(xls_file_path, engine='openpyxl') as writer:
     # Write the original data to the original sheet
     original_xls_df.to_excel(writer, sheet_name='Original', index=False)
